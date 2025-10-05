@@ -1,34 +1,30 @@
 import { useEffect, useState } from "react";
-import CustomSelectArticulo from "../select/CustomSelectArticulo";
-import type { IPresupuestoItem } from "../../types/presupuestos";
+import CustomSelect from "../select/CustomSelect";
+import type { IPresupuestoVendedor } from "../../types/presupuestos";
 
 type props = {
     modalShow: boolean;
+    seleccionWidex: boolean
     cerrarModal: () => void;
-    presupuestoItem: IPresupuestoItem | null;
-    saveItem: (item: IPresupuestoItem) => void;
+    vendedor: IPresupuestoVendedor | null;
+    saveItem: (item: IPresupuestoVendedor) => void;
 }
 
-export const DetalleModal = ({modalShow, cerrarModal, presupuestoItem, saveItem} : props) => {
+export const VendedorModal = ({modalShow, cerrarModal, vendedor, saveItem, seleccionWidex} : props) => {
 
     const [title, setTitle] = useState("");
-    const [descripcion, setDescripcion] = useState<IPresupuestoItem | null>(null);
-    const [cantidad, setCantidad] = useState(0);
-    const [precioUnitario, setPrecioUnitario] = useState(0.0);
+    const [descripcion, setDescripcion] = useState<IPresupuestoVendedor | null>(null);
 
     useEffect(() => {
-        if (presupuestoItem !== null) {
-            setTitle("Modificar")
-            setDescripcion(presupuestoItem);
-            setCantidad(presupuestoItem.cantidad);
-            setPrecioUnitario(presupuestoItem.precio);
-        } else {
+        if (vendedor == null) {
             setTitle("Agregar")
             setDescripcion(null);
-            setCantidad(0);
-            setPrecioUnitario(0.0);
+        } else {
+            setTitle("Modificar")
+            setDescripcion(vendedor);
+            
         }       
-    }, [modalShow, presupuestoItem]);
+    }, [modalShow, vendedor]);
 
     const onClose = () => {
         cerrarModal();;
@@ -36,7 +32,7 @@ export const DetalleModal = ({modalShow, cerrarModal, presupuestoItem, saveItem}
 
     const onclick = () => {       
         if(descripcion !== null )
-            saveItem({...descripcion, cantidad: cantidad, precio: precioUnitario});
+            saveItem({...descripcion, seleccionWidex: seleccionWidex});
    }
 
    return (
@@ -50,14 +46,13 @@ export const DetalleModal = ({modalShow, cerrarModal, presupuestoItem, saveItem}
                             <button type="button" className="btn-close" onClick={onClose} aria-label="Close"></button>
                         </div>
                         <div className="modal-body">
-                            <CustomSelectArticulo 
+                            <CustomSelect<IPresupuestoVendedor> 
                                 col="col-12"
                                 campoNombre="Descripcion: "
                                 selected={descripcion}
-                                setSelected={setDescripcion} />
-
-                            <input type="number" className="form-control mb-2" placeholder="Cantidad" value={cantidad} onChange={(e) => setCantidad(parseInt(e.target.value))} />
-                            <input type="number" step="0.01" className="form-control mb-2" placeholder="Precio Unitario" value={precioUnitario} onChange={(e) => setPrecioUnitario(parseFloat(e.target.value))} />
+                                setSelected={setDescripcion} 
+                                url="/Vendedores"
+                                />
                         </div>
                         <div className="modal-footer">
                             <button type="button" className="btn btn-secondary" onClick={onClose}>Cancelar</button>

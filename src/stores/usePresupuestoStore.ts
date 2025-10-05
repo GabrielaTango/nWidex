@@ -57,10 +57,12 @@ type PresupuestoStore = {
   addItem: (item: IPresupuestoItem) => void;
   updateItem: (data: IPresupuestoItem) => void;
   removeItem: (codigo: string) => void;
+  vendedores: () => IPresupuestoVendedor[];
+  removeVendedor: (codigo: string) => void;
   addVendedor: (v: IPresupuestoVendedor) => void;
 };
 
-const initialPresupuesto: Presupuesto = {
+const initialPresupuesto: IPresupuesto = {
   paciente: null,
   razonSocial: null,
   obraSocial: null,
@@ -72,7 +74,7 @@ const initialPresupuesto: Presupuesto = {
   cobertura: 0,
 };
 
-export const usePresupuestoStore = create<PresupuestoStore>((set) => ({
+export const usePresupuestoStore = create<PresupuestoStore>((set, get) => ({
   presupuesto: initialPresupuesto,
   // actualizar parcialmente
   setPresupuesto: (data) =>
@@ -133,4 +135,12 @@ export const usePresupuestoStore = create<PresupuestoStore>((set) => ({
         vendedores: [...state.presupuesto.vendedores, v],
       },
     })),
+    removeVendedor: (codigo) =>
+    set((state) => ({
+      presupuesto: {
+        ...state.presupuesto,
+        vendedores: state.presupuesto.vendedores.filter((i) => i.codigo !== codigo),
+      },
+    })),
+  vendedores: () => get().presupuesto.vendedores,
 }));

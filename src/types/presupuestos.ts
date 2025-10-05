@@ -33,4 +33,8 @@ export interface IPresupuestoVendedor {
   codigo: string;
   nombre: string;
   comision: number;
+  seleccionWidex: boolean;
+
+  value?: string;
+  label?: string;
 }

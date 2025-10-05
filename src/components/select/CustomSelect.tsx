@@ -1,18 +1,18 @@
 import AsyncSelect from 'react-select/async'
 import { ApiClient } from '../../hooks/apiClient';
-import type { Cliente } from '../../types/clientes';
 import { API_BASE_URL } from '../../api';
 import { useAuth } from '../../stores/usePresupuestoStore';
 import { useNavigate } from 'react-router-dom';
 
-type props = {
-    selected: Cliente | null;
-    setSelected: (user: Cliente | null) => void;
+type props<T> = {
+    selected: T | null;
+    setSelected: (item: T | null) => void;
     campoNombre: string;
-    col : string | 'col-12'
+    col?: string; 
+    url: string; 
 }
 
-export const CustomSelect = ({ selected, setSelected, campoNombre, col }: props) => {
+export const CustomSelect = <T,>({ selected, setSelected, campoNombre, col, url }: props<T>) => {
     
     const { logout } = useAuth();
 
@@ -29,25 +29,20 @@ export const CustomSelect = ({ selected, setSelected, campoNombre, col }: props)
     });
 
 
-    const loadOptions = async (inputValue: string) => {
-        if (!inputValue || inputValue.length < 4) return [];
+const loadOptions = async (inputValue: string): Promise<T[]> => {
+    if (!inputValue || inputValue.length < 4) return [];
 
-        try {
-            const dataResponse = await api.get<Cliente[]>("/Clientes");
+    try {
+        const dataResponse = await api.get<T[]>(url);
+        return dataResponse;
+    } catch (error: unknown) {
+        console.error(error);
+    }
 
-            /*const users = dataResponse.map((user: Cliente) => ({
-                value: user.cod_Client,
-                label: "Codigo: " + user.cod_Client + ", Nombre: " + user.razon_Soci
-            })); */
+    return [];
+};
 
-            return dataResponse;
-        } catch (error: unknown) {
-            console.error(error)
-        }
-        return [];
-    };
-
-    const handleChange = (selectedOption: Cliente) => {
+    const handleChange = (selectedOption: T) => {
         if (selectedOption !== null)
             setSelected(selectedOption);
 
@@ -67,10 +62,10 @@ export const CustomSelect = ({ selected, setSelected, campoNombre, col }: props)
                         loadOptions={loadOptions}
                         defaultOptions
                         value={selected} // <-- Estado controlado
-                        onChange={(e) => handleChange(e as Cliente)}
+                        onChange={(e) => handleChange(e as T)}
                         placeholder="Buscar usuario..."
                     />
-                    <button className='btn btn-primary' onClick={handleClear}>x</button>
+                    <button className='btn btn-primary btn-danger' onClick={handleClear}>x</button>
                 </div>
             </div>
         </div>
