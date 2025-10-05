@@ -1,11 +1,11 @@
 import AsyncSelect from 'react-select/async'
 import { ApiClient } from '../../hooks/apiClient';
 import { API_BASE_URL } from '../../api';
-import type { articulo } from '../../types/articulo';
+import type { IPresupuestoItem } from '../../types/presupuestos';
 
 type props = {
-    selected: articulo | null;
-    setSelected: (user: articulo | null) => void;
+    selected: IPresupuestoItem | null;
+    setSelected: (user: IPresupuestoItem | null) => void;
     campoNombre: string;
     col : string | 'col-12'
 }
@@ -27,7 +27,7 @@ export const CustomSelectArticulo = ({ selected, setSelected, campoNombre, col }
         if (!inputValue || inputValue.length < 4) return [];
 
         try {
-            const dataResponse = await api.get<articulo[]>("/Articulos");
+            const dataResponse = await api.get<IPresupuestoItem[]>("/Articulos");
             /*
             const users = dataResponse.map((art: articulo) => ({
                 value: art.codigo,
@@ -42,7 +42,7 @@ export const CustomSelectArticulo = ({ selected, setSelected, campoNombre, col }
         return [];
     };
 
-    const handleChange = (selectedOption: articulo) => {
+    const handleChange = (selectedOption: IPresupuestoItem) => {
         if (selectedOption !== null)
             setSelected(selectedOption);
 
@@ -62,7 +62,7 @@ export const CustomSelectArticulo = ({ selected, setSelected, campoNombre, col }
                         loadOptions={loadOptions}
                         defaultOptions
                         value={selected} // <-- Estado controlado
-                        onChange={(e) => handleChange(e as articulo)}
+                        onChange={(e) => handleChange(e as IPresupuestoItem)}
                         placeholder="Buscar usuario..."
                     />
                     <button className='btn btn-primary' onClick={handleClear}>x</button>

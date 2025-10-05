@@ -1,14 +1,13 @@
 import AsyncSelect from 'react-select/async'
 import { ApiClient } from '../../hooks/apiClient';
-import type { cliente } from '../../types/clientes';
-import type { dataSelect } from '../../types/dataSelect';
+import type { Cliente } from '../../types/clientes';
 import { API_BASE_URL } from '../../api';
 import { useAuth } from '../../stores/usePresupuestoStore';
 import { useNavigate } from 'react-router-dom';
 
 type props = {
-    selected: dataSelect | null;
-    setSelected: (user: dataSelect | null) => void;
+    selected: Cliente | null;
+    setSelected: (user: Cliente | null) => void;
     campoNombre: string;
     col : string | 'col-12'
 }
@@ -34,21 +33,21 @@ export const CustomSelect = ({ selected, setSelected, campoNombre, col }: props)
         if (!inputValue || inputValue.length < 4) return [];
 
         try {
-            const dataResponse = await api.get<cliente[]>("/Clientes");
+            const dataResponse = await api.get<Cliente[]>("/Clientes");
 
-            const users = dataResponse.map((user: cliente) => ({
+            /*const users = dataResponse.map((user: Cliente) => ({
                 value: user.cod_Client,
                 label: "Codigo: " + user.cod_Client + ", Nombre: " + user.razon_Soci
-            }));
+            })); */
 
-            return users;
+            return dataResponse;
         } catch (error: unknown) {
             console.error(error)
         }
         return [];
     };
 
-    const handleChange = (selectedOption: dataSelect) => {
+    const handleChange = (selectedOption: Cliente) => {
         if (selectedOption !== null)
             setSelected(selectedOption);
 
@@ -68,7 +67,7 @@ export const CustomSelect = ({ selected, setSelected, campoNombre, col }: props)
                         loadOptions={loadOptions}
                         defaultOptions
                         value={selected} // <-- Estado controlado
-                        onChange={(e) => handleChange(e as dataSelect)}
+                        onChange={(e) => handleChange(e as Cliente)}
                         placeholder="Buscar usuario..."
                     />
                     <button className='btn btn-primary' onClick={handleClear}>x</button>

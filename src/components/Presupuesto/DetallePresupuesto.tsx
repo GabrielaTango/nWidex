@@ -1,57 +1,47 @@
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
 import { usePresupuestoStore } from "../../stores/usePresupuestoStore";
 import { DetalleModal } from "./DetalleModal";
-import type { articulo } from "../../types/articulo";
+import type { IPresupuestoItem } from "../../types/presupuestos";
+import { Link } from "react-router-dom";
 
 export const DetallePresupuesto = () => {
 
     const [modalShow, toogleModal] = useState(false);
+    const [presupuestoItem, setPresupuestoItem] = useState<IPresupuestoItem | null>(null);
+    const { presupuesto, addItem, updateItem, removeItem } = usePresupuestoStore();
 
-    const [detalleEdit, setDetalleEdit] = useState<articulo | null>(null);
 
-    const {detalle, setDetalle} = usePresupuestoStore();
+    const saveItem = (item: IPresupuestoItem) => {
+        const existe = presupuesto.items.some(i => i.codArticu === item.codArticu);
+        if (existe)
+            updateItem(item);
+        else
+            addItem(item);
 
-    useEffect(() => {
-        const datosEjemplo: articulo[] = [
-            { codigo: "1", descripcion: "Aud Widex xxxx", cantidad: 1, precio: 500000.00 },
-            { codigo: "2", descripcion: "Pilas", cantidad: 1, precio: 0.00 },
-            { codigo: "3", descripcion: "Molde", cantidad: 1, precio: 0.00 }
-        ];
-        setDetalle(datosEjemplo);
-    }, []);
-
-    const saveItem = (item: articulo) => {
-        const existe = detalle.some(i => i.codigo === item.codigo);
-        if (existe) {
-                setDetalle(
-                detalle.map((it) =>
-                    it.codigo == item.codigo ? item : it
-                )
-            );
-        } 
-        else { 
-            
-            setDetalle([...detalle, item]);
-        }
-
-        setDetalleEdit(null);
+        setPresupuestoItem(null);
         toogleModal(false);
+        irATotales();
     }
 
     const nuevo = () => {
-        setDetalleEdit(null);
+        setPresupuestoItem(null);
         toogleModal(true);
     }
 
-    const deleteItem = (detalleItem: articulo) => {
-        const nuevoDetalle = detalle.filter(item => item.codigo !== detalleItem.codigo);
-        setDetalle(nuevoDetalle);
+    const deleteItem = (detalleItem: IPresupuestoItem) => {
+        removeItem(detalleItem.codArticu);
     }
 
-    const edtiItem = (detalleItem: articulo) => {
-        setDetalleEdit(detalleItem);
+    const edtiItem = (detalleItem: IPresupuestoItem) => {
+        setPresupuestoItem(detalleItem);
         toogleModal(true);
     }
+
+    const totalesAnchor = useRef<HTMLDivElement>(null);
+
+    const irATotales = () => {
+        totalesAnchor.current?.scrollIntoView({ behavior: "smooth" });
+    };
 
     return (
         <>
@@ -59,7 +49,7 @@ export const DetallePresupuesto = () => {
                 saveItem={saveItem}
                 modalShow={modalShow}
                 cerrarModal={() => toogleModal(false)}
-                detalleEdit={detalleEdit}
+                presupuestoItem={presupuestoItem}
             />
             <button type="button" className="btn btn-success btn-sm"
                 onClick={() => nuevo()}>
@@ -73,27 +63,58 @@ export const DetallePresupuesto = () => {
                         <th>Descripción</th>
                         <th>Cantidad</th>
                         <th>Precio Unit.</th>
-                        <th>Subtotal</th>
-                        <th>Acciones</th>
+                        <th className="text-end">Importe</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {
-                        detalle.map((item, index) => (
+                    {presupuesto.items.length === 0 ?
+                        <tr>
+                            <td colSpan={5} className="text-center">No hay items en el presupuesto</td>
+                        </tr>
+                        :
+                        presupuesto.items.map((item, index) => (
                             <tr key={index}>
-                                <td>{item.codigo}</td>
-                                <td>{item.descripcion}</td>
-                                <td>{item.cantidad}</td>
-                                <td>${item.precio.toFixed(2)}</td>
-                                <td>${(item.cantidad * item.precio).toFixed(2)}</td>
-                                <td><button className="btn btn-warning btn-sm" onClick={() => edtiItem(item)}>M</button>
-                                    <button className="btn btn-danger btn-sm ms-2" onClick={() => deleteItem(item)}>X</button>
+
+                                <td >
+                                    <button className="btn btn-danger btn-sm me-2" onClick={() => deleteItem(item)}>X</button>
+                                    <Link onClick={() => edtiItem(item)} to="#" style={{ textDecoration: 'none' }}>
+                                        {item.codArticu}
+                                    </Link>
                                 </td>
+
+                                <td>{item.descripcio}</td>
+                                <td>{item.cantidad.toFixed(2)}</td>
+                                <td>${item.precio.toFixed(2)}</td>
+                                <td className="text-end">${(item.cantidad * item.precio).toFixed(2)}</td>
                             </tr>
                         ))
                     }
                 </tbody>
-            </table>
+                <tfoot>
+                    <tr className="fw-bold" style={{ borderTop: '2px solid black' }}>
+                        <td colSpan={3}></td>
+                        <td >SubTotal</td>
+                        <td className="text-end">${(presupuesto.items.reduce((acc, item) => acc + (item.cantidad * item.precio), 0) / 1.21).toFixed(2)}</td>
+
+                    </tr>
+                    <tr className="fw-bold">
+                        <td colSpan={3}></td>
+                        <td >Cobertura</td>
+                        <td className="text-end">${0.00.toFixed(2)}</td>
+
+                    </tr>
+                    <tr className="fw-bold">
+                        <td colSpan={3}></td>
+                        <td >Total</td>
+                        <td className="text-end">${presupuesto.items.reduce((acc, item) => acc + (item.cantidad * item.precio), 0).toFixed(2)}</td>
+
+                    </tr>
+                </tfoot>
+            </table >
+            <div className="row mt-2">
+                <div className="col12"></div>
+            </div>
+            <div ref={totalesAnchor}></div>
         </>
     )
 }

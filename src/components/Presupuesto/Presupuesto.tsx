@@ -1,11 +1,39 @@
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import CustomSelect from "../select/CustomSelect"
-import { usePresupuestoStore } from "../../stores/usePresupuestoStore";
+import { useAuth, usePresupuestoStore } from "../../stores/usePresupuestoStore";
 import { DetallePresupuesto } from "./DetallePresupuesto";
 import { Solapas } from "./Solapas";
+import { ApiClient } from "../../hooks/apiClient";
+import { API_BASE_URL } from "../../api";
+import type { IPresupuesto } from "../../types/presupuestos";
 
 export const Presupuesto = () => {
-    const { paciente, setPaciente, obraSocial, setObraSocial, razonSocial, setRazonSocial } = usePresupuestoStore();
+
+    const navigate = useNavigate();
+
+    const { logout } = useAuth();
+        const api = new ApiClient({
+            baseUrl:  API_BASE_URL,
+            getToken: () => localStorage.getItem("token"),
+            onUnauthorized: () => {     
+              logout("Su sesion ha expirado!!!")
+              navigate("/login")
+            },
+            retries: 2
+        });
+
+    const { presupuesto, setPaciente, setRazonSocial, setObraSocial } = usePresupuestoStore();
+
+    const verPresup = () => {
+        console.log(presupuesto);
+        api.post<IPresupuesto>("/Presupuesto/Calcular", presupuesto)
+        .then((data) => {
+            console.log("Presupuesto guardado:", data);
+        })
+        .catch((error) => {
+            console.error("Error guardando el presupuesto:", error);
+        });
+    }
 
     return (
         <>
@@ -13,6 +41,7 @@ export const Presupuesto = () => {
                 <div className="col-12">
                     <h1>Presupuesto</h1>
                     <Link className="btn btn-primary float-end" to="/">Volver</Link>
+                    {presupuesto.paciente?.cod_Client}
                 </div>
             </div>
             <hr />
@@ -21,17 +50,17 @@ export const Presupuesto = () => {
                     <CustomSelect
                         col="col-12"
                         campoNombre="Paciente "
-                        selected={paciente}
+                        selected={presupuesto.paciente}
                         setSelected={setPaciente} />
                     <CustomSelect
                         col="col-12"
                         campoNombre="Razon Social"
-                        selected={razonSocial}
+                        selected={presupuesto.razonSocial}
                         setSelected={setRazonSocial} />
                     <CustomSelect
                         col="col-12"
                         campoNombre="Obra Social"
-                        selected={obraSocial}
+                        selected={presupuesto.obraSocial}
                         setSelected={setObraSocial} />
                     <div className="mb-3">
                         <label htmlFor="formFileMultiple" className="form-label">Orden de compra</label>
@@ -50,6 +79,12 @@ export const Presupuesto = () => {
                     <DetallePresupuesto />
                 </div>
             </div>
-        </>
+            <div className="row mt-2">
+                <div className="col-12">
+            <button onClick={() => verPresup()}>Ver Presupuesto por consola</button>
+                </div>
+            </div>
+            
+         </>
     )
 }

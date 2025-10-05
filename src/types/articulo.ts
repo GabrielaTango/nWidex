@@ -4,10 +4,5 @@ export type articulo = {
     cantidad : number
     precio: number
     
-    descAdic?: string 
-    sinonimo?: string 
-    codBarra?: string 
-    
-    value?: string
-    label?: string
+
 }

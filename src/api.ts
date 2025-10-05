@@ -1,2 +1,2 @@
-export const API_BASE_URL = "https://localhost:7041/api";
+export const API_BASE_URL = "http://localhost:5000/api";
 export const APP_TOKEN_TEMP = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6InN0cmluZyIsInJvbGUiOiJhZG1pbiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvdXNlcmRhdGEiOiJ4eHh4eCIsIm5iZiI6MTc1Nzg4ODczOSwiZXhwIjoxNzU3ODk1OTM5LCJpYXQiOjE3NTc4ODg3MzksImlzcyI6IndpZGV4YXBpLmNvbSIsImF1ZCI6ImxvY2FsaG9zdCJ9.7j7V3UWMgROU64w1DMCjppUR8Dmo5j5ZZ707WWuWkhI";

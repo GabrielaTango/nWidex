@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import CustomSelectArticulo from "../select/CustomSelectArticulo";
-import type { articulo } from "../../types/articulo";
+import type { IPresupuestoItem } from "../../types/presupuestos";
 
 type props = {
     modalShow: boolean;
     cerrarModal: () => void;
-    detalleEdit: articulo | null;
-    saveItem: (item: articulo) => void;
+    presupuestoItem: IPresupuestoItem | null;
+    saveItem: (item: IPresupuestoItem) => void;
 }
 
 /*
@@ -15,32 +15,32 @@ type dataSelect = {
   label: string;
 } */
 
-export const DetalleModal = ({modalShow, cerrarModal, detalleEdit, saveItem} : props) => {
+export const DetalleModal = ({modalShow, cerrarModal, presupuestoItem, saveItem} : props) => {
 
     const [title, setTitle] = useState("");
-    const [descripcion, setDescripcion] = useState<articulo | null>(null);
+    const [descripcion, setDescripcion] = useState<IPresupuestoItem | null>(null);
     const [cantidad, setCantidad] = useState(0);
     const [precioUnitario, setPrecioUnitario] = useState(0.0);
 
     useEffect(() => {
-        if (detalleEdit !== null) {
+        if (presupuestoItem !== null) {
             setTitle("Modificar")
-            setDescripcion(detalleEdit);
-            setCantidad(detalleEdit.cantidad);
-            setPrecioUnitario(detalleEdit.precio);
+            setDescripcion(presupuestoItem);
+            setCantidad(presupuestoItem.cantidad);
+            setPrecioUnitario(presupuestoItem.precio);
         } else {
             setTitle("Agregar")
             setDescripcion(null);
             setCantidad(0);
             setPrecioUnitario(0.0);
         }       
-    }, [modalShow, detalleEdit]);
+    }, [modalShow, presupuestoItem]);
 
     const onClose = () => {
         cerrarModal();;
     }
 
-    const onclick = () => {
+    const onclick = () => {       
         if(descripcion !== null )
             saveItem({...descripcion, cantidad: cantidad, precio: precioUnitario});
    }
