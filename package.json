@@ -4,12 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "npm-run-all --parallel backend vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "backend": "cd nWidexAPI/Debug/net8.0 && nWidexAPI.exe",
-    "widex": "npm-run-all --parallel backend dev"
+    "vite": "vite"
   },
   "dependencies": {
     "bootstrap": "^5.3.8",
